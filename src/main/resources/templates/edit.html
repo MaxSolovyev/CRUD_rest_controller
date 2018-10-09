@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html   xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+</head>
+<body>
+    <form class="form-horizontal">
+        <fieldset>
+            <div class="control-group">
+                <!-- Id -->
+                <label class="control-label" for="id">code</label>
+                <div class="controls">
+                    <input type="text" id="id" name="id" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Name -->
+                <label class="control-label" for="name">name</label>
+                <div class="controls">
+                    <input type="text" id="name" name="name" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Login -->
+                <label class="control-label"  for="login">login</label>
+                <div class="controls">
+                    <input type="text" id="login" name="login" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Password-->
+                <label class="control-label" for="password">password</label>
+                <div class="controls">
+                    <input type="password" id="password" name="password" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Roles-->
+                <label class="control-label" for="role">role</label>
+                <div class="controls">
+                    <input type="text" id="role" name="role" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Button -->
+                <div class="controls">
+                    <button type="button" id="btnedit" class="btn btn-success">
+                        update
+                    </button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</body>
+
+<script>
+    $(document).ready(function() {
+        loadUser();
+    })
+
+    $('#btnedit').on('click', function () {
+        editUser();
+    })
+
+    function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    }
+
+    function deluser(id) {
+        $.ajax({
+            type: "DELETE",
+            url: "/api/users/" + id,
+            success: function () {
+                $('#tr'+id).remove();
+            },
+            error: function (err) {
+                alert("ERROR: ",err);
+                console.log("ERROR: ",err);
+            }
+        });
+    }
+
+    function loadUser() {
+        var id = getUrlParameter('id');
+
+        $.ajax({
+            type: "GET",
+            url: "/api/users/" + id,
+            datatype: 'json',
+            success: function(data){
+                $('#id').val(data.id);
+                $('#name').val(data.name);
+                $('#login').val(data.login);
+                $('#password').val(data.password);
+                for(var ind in data.roles) {
+                    $('#role').val(data.roles[ind]['name']);
+                }
+            },
+            error: function(error){
+                alert(error);
+            }
+        }).done()
+    }
+
+    function editUser() {
+        var roles = [
+            {"name" : $('#role').val()}
+        ]
+        var user = {
+            "id" : $('#id').val(),
+            "name" : $('#name').val(),
+            "login" : $('#login').val(),
+            "password" : $('#password').val(),
+            "roles" : roles
+        }
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: "PUT",
+            url: "/api/users",
+            datatype: 'application/json',
+            data: JSON.stringify(user),
+            success: function(data){
+                $(location).attr('href',"/admin");
+            },
+            error: function(error){
+                alert(error);
+            }
+        }).done()
+    }
+
+
+</script>
+
+</html>

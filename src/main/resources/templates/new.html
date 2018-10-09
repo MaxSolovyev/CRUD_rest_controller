@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html   xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+        lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+</head>
+<body>
+    <form class="form-horizontal">
+        <fieldset>
+            <div class="control-group">
+                <!-- Name -->
+                <label class="control-label" for="name">name</label>
+                <div class="controls">
+                    <input type="text" id="name" name="name" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Login -->
+                <label class="control-label"  for="login">login</label>
+                <div class="controls">
+                    <input type="text" id="login" name="login" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Password-->
+                <label class="control-label" for="password">password</label>
+                <div class="controls">
+                    <input type="password" id="password" name="password" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Role-->
+                <label class="control-label" for="role">role</label>
+                <div class="controls">
+                    <input type="text" id="role" name="role" value="" placeholder="" class="input-xlarge">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Button -->
+                <div class="controls">
+                    <button type="button" id="btnnew" class="btn btn-success">
+                        add User
+                    </button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+
+</body>
+
+<script>
+    $('#btnnew').on('click', function () {
+        addUser();
+    })
+
+    function addUser() {
+        var roles = [
+            {"name" : $('#role').val()}
+        ]
+        var user = {
+            "name" : $('#name').val(),
+            "login" : $('#login').val(),
+            "password" : $('#password').val(),
+            "roles" : roles
+        }
+        console.log(JSON.stringify(user))
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: "POST",
+            url: "/api/users",
+            datatype: 'application/json',
+            data: JSON.stringify(user),
+            success: function(data){
+                $(location).attr('href',"/admin");
+            },
+            error: function(error){
+                alert(error);
+            }
+        }).done()
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html   xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+        lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User menu</title>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+</head>
+<body>
+
+<p>
+    <div th:if="${#authentication.isAuthenticated()}">
+        Welcome, <span sec:authentication="name"></span>
+    </div>
+</p>
+
+<div class="controls">
+    <p>
+        <a th:href="@{/logout}">Logout</a>
+    </p>
+</div>
+
+<div class="controls">
+    <form action='/admin/register'>
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-10">
+            <br><br>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thread>
+                        <tr class="active">
+                            <th>id</th>
+                            <th>name</th>
+                            <th>login</th>
+                            <th>password</th>
+                            <th>role</th>
+                            <th>control</th>
+                        </tr>
+                    </thread>
+                    <tbody id = "list_users">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        loadUsers();
+    })
+
+    $('#updateList').on('click', function () {
+        loadUsers();
+    })
+
+    function deluser(id) {
+        $.ajax({
+            type: "DELETE",
+            url: "/api/users/" + id,
+            success: function () {
+                $('#tr'+id).remove();
+            },
+            error: function (err) {
+                alert("ERROR: ",err);
+                console.log("ERROR: ",err);
+            }
+        });
+    }
+
+    function loadUsers() {
+        $.ajax({
+            type: "GET",
+            url: "/api/users",
+            datatype: 'json',
+            success: function(data){
+                for (var key in data) {
+                    var rolestr = '';
+                    var roles = data[key]['roles'];
+                    for(var ind in roles) {
+                        rolestr = rolestr + roles[ind]['name'] + "<br>";
+                    }
+                    $('#list_users').append(
+                        '<tr id="tr' + data[key]['id']+'">' +
+                            '<td>' + data[key]['id'] + '</td>' +
+                            '<td>' + data[key]['name'] + '</td>' +
+                            '<td>' + data[key]['login'] + '</td>' +
+                            '<td>' + data[key]['password'] + '</td>' +
+                            '<td>' + rolestr + '</td>' +
+
+                            '<td align="center">' +
+                                '<div class="btn-group">' +
+                                    '<a href="/admin/edit?id='+data[key]['id']+'"><button type="button" class="btn btn-primary">Edit</button></a>' +
+                                    // '<button  type="button" id="btnedit'+data[key]['id']+'" class="btn btn-primary">Edit</button></a>' +
+                                    '<button onclick="deluser('+data[key]['id']+')" type="button" id="btndel'+data[key]['id']+'" class="btn btn-primary">Delete</button></a>' +
+                                '</div>' +
+                            '</td>' +
+
+                        '</tr>'
+                    );
+                }
+            },
+            error: function(error){
+                alert(error);
+            }
+        }).done()
+    }
+
+</script>
+
+</body>
+
+
+
+</html>
